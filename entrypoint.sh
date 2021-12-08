@@ -42,8 +42,15 @@ echo "Trying to deploy"
 case $AMPLIFY_COMMAND in
 
   deploy)
-    is_new_branch=$(aws amplify get-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION} 2> /dev/null)    
-    if [[ -z  "$is_new_branch" ]]; then
+    echo "Check if branch is new"
+    is_new_branch=true
+    if sh -c "aws amplify get-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION}"; then
+      is_new_branch=false
+    fi
+
+    echo "Is branch new: $is_new_branch"
+
+    if [[ -z  "$is_new_branch" ]]; then      
       sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION}"
       sleep 10
     fi
@@ -61,6 +68,8 @@ case $AMPLIFY_COMMAND in
     ;;
 
 esac
+
+echo "Deployed"
 
 aws configure --profile amplify-preview-actions <<-EOF > /dev/null 2>&1
 null
