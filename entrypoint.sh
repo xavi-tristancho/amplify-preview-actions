@@ -62,14 +62,14 @@ case $AMPLIFY_COMMAND in
 
     while : ; do
         echo "Checking if job is completed"
-        is_completed=$(sh -c "aws amplify get-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-id=${job_id} --region=${AWS_REGION} | grep -oE '\"endTime\":.*\"'") 
-        echo "Is Job completed: $is_completed"
-        if is_completed; then
-          echo "Job is completed"
-          break;
-        else
+        response=$(sh -c "aws amplify get-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-id=${job_id} --region=${AWS_REGION}")        
+        is_pending=$(echo $response | sed -n 's/^.*"endTime".*$/endTime/p')        
+        if [ -z "$is_pending" ] ; then
           echo "Job is not completed"
           sleep 20
+        else
+          echo "Job is completed"
+          break;
         fi          
     done
     ;;
