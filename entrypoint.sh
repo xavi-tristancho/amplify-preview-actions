@@ -62,7 +62,7 @@ case $AMPLIFY_COMMAND in
 
     while : ; do
         echo "Checking if job is completed"
-        if sh -c "aws amplify get-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-id=${job_id} | ggrep -oP '\"endTime\":.*\"'"; then
+        if sh -c "aws amplify get-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-id=${job_id} | grep -oP '\"endTime\":.*\"'"; then
           echo "Job is completed"
           break;
         else
