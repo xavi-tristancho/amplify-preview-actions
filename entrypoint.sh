@@ -57,7 +57,19 @@ case $AMPLIFY_COMMAND in
       sleep 10
     fi
 
-    sh -c "aws amplify start-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-type=RELEASE --region=${AWS_REGION}"
+    output=$(sh -c "aws amplify start-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-type=RELEASE --region=${AWS_REGION}")
+    job_id=$(echo $output | sed -n 's/^.*"jobId": "\([0-9].\)",.*$/\1/p')    
+
+    while : ; do
+        echo "Checking if job is completed"
+        if sh -c "aws amplify get-job --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --job-id=${job_id} | ggrep -oP '\"endTime\":.*\"'"; then
+          echo "Job is completed"
+          break;
+        else
+          echo "Job is not completed"
+          sleep 20
+        fi          
+    done
     ;;
 
   delete)
@@ -70,21 +82,3 @@ case $AMPLIFY_COMMAND in
     ;;
 
 esac
-
-echo "Deployed"
-
-aws configure --profile amplify-preview-actions <<-EOF > /dev/null 2>&1
-null
-null
-null
-text
-EOF
-
-echo $COMMENT_URL
-
-if [ -z "$GITHUB_TOKEN" ] ; then
-  echo "Skipping comment as GITHUB_TOKEN not provided"
-else 
-  SUBDOMAIN_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9-]/-/')
-  curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview branch generated at https://$SUBDOMAIN_NAME.${AmplifyAppId}.amplifyapp.com"'" }'
-fi
