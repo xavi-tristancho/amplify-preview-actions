@@ -84,3 +84,10 @@ case $AMPLIFY_COMMAND in
     ;;
 
 esac
+
+if [ -z "$GITHUB_TOKEN" ] ; then
+  echo "Skipping comment as GITHUB_TOKEN not provided"
+else 
+  SUBDOMAIN_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9-]/-/')
+  curl -X POST $COMMENT_URL -H "Content-Type: application/json" -H "Authorization: token $GITHUB_TOKEN" --data '{ "body": "'"Preview branch generated at https://$SUBDOMAIN_NAME.${AmplifyAppId}.amplifyapp.com"'" }'
+fi
