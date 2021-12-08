@@ -52,7 +52,7 @@ case $AMPLIFY_COMMAND in
 
     echo "Is branch new: $is_new_branch"
 
-    if [ -z  "$is_new_branch" ] ; then
+    if [ "$is_new_branch" = true ] ; then
       sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION}"
       sleep 10
     fi
