@@ -67,8 +67,6 @@ null
 text
 EOF
 
-echo $COMMENT_URL
-
 if [ -z "$GITHUB_TOKEN" ] ; then
   echo "Skipping comment as GITHUB_TOKEN not provided"
 else 
