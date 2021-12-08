@@ -40,9 +40,8 @@ EOF
 case $AMPLIFY_COMMAND in
 
   deploy)
-    branch_exists=$(aws amplify get-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION} 2> /dev/null)
-    echo $branch_exists
-    if [[ ! -z  "$branch_exists" ]]; then
+    is_new_branch=$(aws amplify get-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION} 2> /dev/null)    
+    if [[ -z  "$is_new_branch" ]]; then
       sh -c "aws amplify create-branch --app-id=${AmplifyAppId} --branch-name=$BRANCH_NAME --region=${AWS_REGION}"
       sleep 10
     fi
